@@ -77,41 +77,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-  function viewProduct(productId) {
-    fetch('products.json')
-      .then(response => response.json())
-      .then(products => {
-        const product = products.find(p => p.id === productId);
-        if (product) {
-          // Töltsd be a modal tartalmát dinamikusan
-          document.getElementById('modal-title').innerText = product.name;
-          document.getElementById('modal-image').src = product.image;
-          document.getElementById('modal-description').innerText = product.description;
-  
-          // Ízek betöltése
-          const flavorsList = document.getElementById('modal-flavors');
-          flavorsList.innerHTML = product.flavors
-            ? product.flavors.map(flavor => `<li>${flavor}</li>`).join('')
-            : '<li>Nincs információ</li>';
-  
-          // Kiszerelés betöltése
-          const packagingList = document.getElementById('modal-packaging');
-          packagingList.innerHTML = product.packaging
-            ? product.packaging.map(size => `<li>${size}</li>`).join('')
-            : '<li>Nincs információ</li>';
-  
-          // Adagolás betöltése
-          const dosageElement = document.getElementById('modal-dosage');
-          dosageElement.innerText = product.dosage || 'Nincs információ';
-  
-          // Modal megjelenítése
-          new bootstrap.Modal(document.getElementById('productModal')).show();
+function viewProduct(productId) {
+  fetch('products.json')
+    .then(response => response.json())
+    .then(products => {
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        // Töltsd be a modal tartalmát dinamikusan
+        document.getElementById('modal-title').innerText = product.name;
+        document.getElementById('modal-image').src = product.image;
+        document.getElementById('modal-description').innerText = product.description;
+
+        // Ízek betöltése
+        const flavorsList = document.getElementById('modal-flavors');
+        flavorsList.innerHTML = product.flavors
+          ? product.flavors.map(flavor => `<li>${flavor}</li>`).join('')
+          : '<li>Nincs információ</li>';
+
+        // Desszert ízek betöltése (csak Power Whey esetén)
+        const dessertFlavorsList = document.getElementById('modal-dessert-flavors');
+        if (product.name === "Power Whey" && product.dessert_flavors) {
+          dessertFlavorsList.innerHTML = product.dessert_flavors.map(flavor => `<li>${flavor}</li>`).join('');
+          document.getElementById('dessert-flavors-section').style.display = 'block'; // Megjelenítjük a szekciót
         } else {
-          console.error('Nem található a termék az adott azonosítóval:', productId);
+          document.getElementById('dessert-flavors-section').style.display = 'none'; // Elrejtjük a szekciót
         }
-      })
-      .catch(error => console.error('Hiba a termék részleteinek betöltésekor:', error));
-  }
+
+        // Kiszerelés betöltése
+        const packagingList = document.getElementById('modal-packaging');
+        packagingList.innerHTML = product.packaging
+          ? product.packaging.map(size => `<li>${size}</li>`).join('')
+          : '<li>Nincs információ</li>';
+
+        // Adagolás betöltése
+        const dosageElement = document.getElementById('modal-dosage');
+        dosageElement.innerText = product.dosage || 'Nincs információ';
+
+        // Modal megjelenítése
+        new bootstrap.Modal(document.getElementById('productModal')).show();
+      } else {
+        console.error('Nem található a termék az adott azonosítóval:', productId);
+      }
+    })
+    .catch(error => console.error('Hiba a termék részleteinek betöltésekor:', error));
+}
   
 
 const scrollArrow = document.getElementById('scroll-arrow');
